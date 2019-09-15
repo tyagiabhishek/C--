@@ -1,0 +1,2202 @@
+Terminals unused in grammar
+
+   TYPEDEF
+   QUOT
+
+
+Grammar
+
+    0 $accept: code $end
+
+    1 code: code_do
+
+    2 code_do: struct_decl code_do
+    3        | func_defn_decl code_do
+    4        | %empty
+
+    5 struct_decl: str_head LEFT_CURLY_BRACKET dslist RIGHT_CURLY_BRACKET SEMICOLON
+
+    6 str_head: STRUCT IDENTIFIER
+
+    7 func_defn_decl: func_head func_body
+
+    8 func_body: LEFT_CURLY_BRACKET optional_stmt RIGHT_CURLY_BRACKET
+
+    9 optional_stmt: stmt_list
+   10              | %empty
+
+   11 func_head: res_id LEFT_OPEN_BRACKET decl_plist RIGHT_OPEN_BRACKET
+
+   12 res_id: result IDENTIFIER
+
+   13 result: INTEGER
+   14       | FLOAT
+   15       | CHAR
+   16       | VOID
+   17       | STRUCT IDENTIFIER
+
+   18 decl_plist: decl_param COMMA decl_plist
+   19           | decl_param
+   20           | VOID
+   21           | %empty
+
+   22 decl_param: type decl_ids
+
+   23 decl_ids: IDENTIFIER br_param
+
+   24 br_param: LEFT_CLOSED_BRACKET NUMBER_INT RIGHT_CLOSED_BRACKET br_param
+   25         | %empty
+
+   26 dslist: struct_declaration
+   27       | dslist struct_declaration
+
+   28 var_decl: declaration
+
+   29 struct_declaration: type struct_list_id SEMICOLON
+
+   30 declaration: type list_id SEMICOLON
+
+   31 type: INTEGER
+   32     | FLOAT
+   33     | CHAR
+   34     | STRUCT IDENTIFIER
+
+   35 struct_list_id: id_arr
+   36               | struct_list_id COMMA id_arr
+
+   37 list_id: id_arr
+   38        | list_id COMMA id_arr
+
+   39 id_arr: IDENTIFIER br_dimlist
+   40       | IDENTIFIER
+
+   41 br_dimlist: LEFT_CLOSED_BRACKET NUMBER_INT RIGHT_CLOSED_BRACKET
+   42           | LEFT_CLOSED_BRACKET NUMBER_INT RIGHT_CLOSED_BRACKET br_dimlist
+
+   43 $@1: %empty
+
+   44 body: LEFT_CURLY_BRACKET $@1 optional_stmt RIGHT_CURLY_BRACKET
+
+   45 stmt_list: stmt_list m_inter stmt
+   46          | stmt
+
+   47 stmt: matched_stmt
+   48     | ifexp stmt
+   49     | ifexp matched_stmt n_inter ELSE m_inter stmt
+
+   50 n_inter: %empty
+
+   51 m_inter: %empty
+
+   52 matched_stmt: whileexp body
+   53             | asg SEMICOLON
+   54             | func_call SEMICOLON
+   55             | RETURN exp SEMICOLON
+   56             | RETURN SEMICOLON
+   57             | body
+   58             | var_decl
+
+   59 ifexp: IF LEFT_OPEN_BRACKET exp RIGHT_OPEN_BRACKET
+
+   60 whileexp: WHILE m_inter LEFT_OPEN_BRACKET exp RIGHT_OPEN_BRACKET
+
+   61 asg: lhs EQUALS exp
+
+   62 lhs: IDENTIFIER
+   63    | IDENTIFIER DOT IDENTIFIER
+   64    | br_elist RIGHT_CLOSED_BRACKET
+
+   65 br_elist: br_elist RIGHT_CLOSED_BRACKET LEFT_CLOSED_BRACKET exp
+   66         | IDENTIFIER LEFT_CLOSED_BRACKET exp
+   67         | IDENTIFIER DOT IDENTIFIER LEFT_CLOSED_BRACKET exp
+
+   68 exp: exp OR OR aa_exp
+   69    | aa_exp
+
+   70 aa_exp: d_exp
+   71       | aa_exp AND AND d_exp
+
+   72 d_exp: pm_exp
+   73      | pm_exp GREATER_THAN pm_exp
+   74      | pm_exp NOT EQUALS pm_exp
+   75      | pm_exp EQUALS EQUALS pm_exp
+   76      | pm_exp LESS_THAN pm_exp
+   77      | pm_exp LESS_THAN EQUALS pm_exp
+   78      | pm_exp GREATER_THAN EQUALS pm_exp
+   79      | NOT LEFT_OPEN_BRACKET exp RIGHT_OPEN_BRACKET
+
+   80 pm_exp: pm_exp PLUS t_exp
+   81       | pm_exp MINUS t_exp
+   82       | t_exp
+
+   83 t_exp: f_exp STAR t_exp
+   84      | f_exp SLASH t_exp
+   85      | f_exp
+
+   86 f_exp: NUMBER_INT
+   87      | CHARACTER
+   88      | NUMBER_FLOAT
+   89      | IDENTIFIER
+   90      | IDENTIFIER DOT IDENTIFIER
+   91      | br_elist RIGHT_CLOSED_BRACKET
+   92      | func_call
+   93      | LEFT_OPEN_BRACKET exp RIGHT_OPEN_BRACKET
+
+   94 func_call_head: IDENTIFIER
+
+   95 func_call: func_call_head LEFT_OPEN_BRACKET paramlist RIGHT_OPEN_BRACKET
+
+   96 paramlist: plist
+   97          | %empty
+
+   98 plist: exp COMMA plist
+   99      | exp
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+error (256)
+PLUS (258) 80
+MINUS (259) 81
+STAR (260) 83
+SLASH (261) 84
+LEFT_CURLY_BRACKET (262) 5 8 44
+RIGHT_CURLY_BRACKET (263) 5 8 44
+LEFT_CLOSED_BRACKET (264) 24 41 42 65 66 67
+RIGHT_CLOSED_BRACKET (265) 24 41 42 64 65 91
+LEFT_OPEN_BRACKET (266) 11 59 60 79 93 95
+RIGHT_OPEN_BRACKET (267) 11 59 60 79 93 95
+IDENTIFIER (268) 6 12 17 23 34 39 40 62 63 66 67 89 90 94
+CHARACTER (269) 87
+NUMBER_INT (270) 24 41 42 86
+NUMBER_FLOAT (271) 88
+TYPEDEF (272)
+INTEGER (273) 13 31
+FLOAT (274) 14 32
+CHAR (275) 15 33
+VOID (276) 16 20
+STRUCT (277) 6 17 34
+DOT (278) 63 67 90
+SEMICOLON (279) 5 29 30 53 54 55 56
+OR (280) 68
+AND (281) 71
+EQUALS (282) 61 74 75 77 78
+LESS_THAN (283) 76 77
+GREATER_THAN (284) 73 78
+IF (285) 59
+NOT (286) 74 79
+WHILE (287) 60
+QUOT (288)
+RETURN (289) 55 56
+COMMA (290) 18 36 38 98
+ELSE (291) 49
+
+
+Nonterminals, with rules where they appear
+
+$accept (37)
+    on left: 0
+code (38)
+    on left: 1, on right: 0
+code_do (39)
+    on left: 2 3 4, on right: 1 2 3
+struct_decl (40)
+    on left: 5, on right: 2
+str_head (41)
+    on left: 6, on right: 5
+func_defn_decl (42)
+    on left: 7, on right: 3
+func_body (43)
+    on left: 8, on right: 7
+optional_stmt (44)
+    on left: 9 10, on right: 8 44
+func_head (45)
+    on left: 11, on right: 7
+res_id (46)
+    on left: 12, on right: 11
+result (47)
+    on left: 13 14 15 16 17, on right: 12
+decl_plist (48)
+    on left: 18 19 20 21, on right: 11 18
+decl_param (49)
+    on left: 22, on right: 18 19
+decl_ids (50)
+    on left: 23, on right: 22
+br_param (51)
+    on left: 24 25, on right: 23 24
+dslist (52)
+    on left: 26 27, on right: 5 27
+var_decl (53)
+    on left: 28, on right: 58
+struct_declaration (54)
+    on left: 29, on right: 26 27
+declaration (55)
+    on left: 30, on right: 28
+type (56)
+    on left: 31 32 33 34, on right: 22 29 30
+struct_list_id (57)
+    on left: 35 36, on right: 29 36
+list_id (58)
+    on left: 37 38, on right: 30 38
+id_arr (59)
+    on left: 39 40, on right: 35 36 37 38
+br_dimlist (60)
+    on left: 41 42, on right: 39 42
+body (61)
+    on left: 44, on right: 52 57
+$@1 (62)
+    on left: 43, on right: 44
+stmt_list (63)
+    on left: 45 46, on right: 9 45
+stmt (64)
+    on left: 47 48 49, on right: 45 46 48 49
+n_inter (65)
+    on left: 50, on right: 49
+m_inter (66)
+    on left: 51, on right: 45 49 60
+matched_stmt (67)
+    on left: 52 53 54 55 56 57 58, on right: 47 49
+ifexp (68)
+    on left: 59, on right: 48 49
+whileexp (69)
+    on left: 60, on right: 52
+asg (70)
+    on left: 61, on right: 53
+lhs (71)
+    on left: 62 63 64, on right: 61
+br_elist (72)
+    on left: 65 66 67, on right: 64 65 91
+exp (73)
+    on left: 68 69, on right: 55 59 60 61 65 66 67 68 79 93 98 99
+aa_exp (74)
+    on left: 70 71, on right: 68 69 71
+d_exp (75)
+    on left: 72 73 74 75 76 77 78 79, on right: 70 71
+pm_exp (76)
+    on left: 80 81 82, on right: 72 73 74 75 76 77 78 80 81
+t_exp (77)
+    on left: 83 84 85, on right: 80 81 82 83 84
+f_exp (78)
+    on left: 86 87 88 89 90 91 92 93, on right: 83 84 85
+func_call_head (79)
+    on left: 94, on right: 95
+func_call (80)
+    on left: 95, on right: 54 92
+paramlist (81)
+    on left: 96 97, on right: 95
+plist (82)
+    on left: 98 99, on right: 96 98
+
+
+State 0
+
+    0 $accept: . code $end
+
+    INTEGER  shift, and go to state 1
+    FLOAT    shift, and go to state 2
+    CHAR     shift, and go to state 3
+    VOID     shift, and go to state 4
+    STRUCT   shift, and go to state 5
+
+    $default  reduce using rule 4 (code_do)
+
+    code            go to state 6
+    code_do         go to state 7
+    struct_decl     go to state 8
+    str_head        go to state 9
+    func_defn_decl  go to state 10
+    func_head       go to state 11
+    res_id          go to state 12
+    result          go to state 13
+
+
+State 1
+
+   13 result: INTEGER .
+
+    $default  reduce using rule 13 (result)
+
+
+State 2
+
+   14 result: FLOAT .
+
+    $default  reduce using rule 14 (result)
+
+
+State 3
+
+   15 result: CHAR .
+
+    $default  reduce using rule 15 (result)
+
+
+State 4
+
+   16 result: VOID .
+
+    $default  reduce using rule 16 (result)
+
+
+State 5
+
+    6 str_head: STRUCT . IDENTIFIER
+   17 result: STRUCT . IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 14
+
+
+State 6
+
+    0 $accept: code . $end
+
+    $end  shift, and go to state 15
+
+
+State 7
+
+    1 code: code_do .
+
+    $default  reduce using rule 1 (code)
+
+
+State 8
+
+    2 code_do: struct_decl . code_do
+
+    INTEGER  shift, and go to state 1
+    FLOAT    shift, and go to state 2
+    CHAR     shift, and go to state 3
+    VOID     shift, and go to state 4
+    STRUCT   shift, and go to state 5
+
+    $default  reduce using rule 4 (code_do)
+
+    code_do         go to state 16
+    struct_decl     go to state 8
+    str_head        go to state 9
+    func_defn_decl  go to state 10
+    func_head       go to state 11
+    res_id          go to state 12
+    result          go to state 13
+
+
+State 9
+
+    5 struct_decl: str_head . LEFT_CURLY_BRACKET dslist RIGHT_CURLY_BRACKET SEMICOLON
+
+    LEFT_CURLY_BRACKET  shift, and go to state 17
+
+
+State 10
+
+    3 code_do: func_defn_decl . code_do
+
+    INTEGER  shift, and go to state 1
+    FLOAT    shift, and go to state 2
+    CHAR     shift, and go to state 3
+    VOID     shift, and go to state 4
+    STRUCT   shift, and go to state 5
+
+    $default  reduce using rule 4 (code_do)
+
+    code_do         go to state 18
+    struct_decl     go to state 8
+    str_head        go to state 9
+    func_defn_decl  go to state 10
+    func_head       go to state 11
+    res_id          go to state 12
+    result          go to state 13
+
+
+State 11
+
+    7 func_defn_decl: func_head . func_body
+
+    LEFT_CURLY_BRACKET  shift, and go to state 19
+
+    func_body  go to state 20
+
+
+State 12
+
+   11 func_head: res_id . LEFT_OPEN_BRACKET decl_plist RIGHT_OPEN_BRACKET
+
+    LEFT_OPEN_BRACKET  shift, and go to state 21
+
+
+State 13
+
+   12 res_id: result . IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 22
+
+
+State 14
+
+    6 str_head: STRUCT IDENTIFIER .
+   17 result: STRUCT IDENTIFIER .
+
+    IDENTIFIER  reduce using rule 17 (result)
+    $default    reduce using rule 6 (str_head)
+
+
+State 15
+
+    0 $accept: code $end .
+
+    $default  accept
+
+
+State 16
+
+    2 code_do: struct_decl code_do .
+
+    $default  reduce using rule 2 (code_do)
+
+
+State 17
+
+    5 struct_decl: str_head LEFT_CURLY_BRACKET . dslist RIGHT_CURLY_BRACKET SEMICOLON
+
+    INTEGER  shift, and go to state 23
+    FLOAT    shift, and go to state 24
+    CHAR     shift, and go to state 25
+    STRUCT   shift, and go to state 26
+
+    dslist              go to state 27
+    struct_declaration  go to state 28
+    type                go to state 29
+
+
+State 18
+
+    3 code_do: func_defn_decl code_do .
+
+    $default  reduce using rule 3 (code_do)
+
+
+State 19
+
+    8 func_body: LEFT_CURLY_BRACKET . optional_stmt RIGHT_CURLY_BRACKET
+
+    LEFT_CURLY_BRACKET  shift, and go to state 30
+    IDENTIFIER          shift, and go to state 31
+    INTEGER             shift, and go to state 23
+    FLOAT               shift, and go to state 24
+    CHAR                shift, and go to state 25
+    STRUCT              shift, and go to state 26
+    IF                  shift, and go to state 32
+    WHILE               shift, and go to state 33
+    RETURN              shift, and go to state 34
+
+    $default  reduce using rule 10 (optional_stmt)
+
+    optional_stmt   go to state 35
+    var_decl        go to state 36
+    declaration     go to state 37
+    type            go to state 38
+    body            go to state 39
+    stmt_list       go to state 40
+    stmt            go to state 41
+    matched_stmt    go to state 42
+    ifexp           go to state 43
+    whileexp        go to state 44
+    asg             go to state 45
+    lhs             go to state 46
+    br_elist        go to state 47
+    func_call_head  go to state 48
+    func_call       go to state 49
+
+
+State 20
+
+    7 func_defn_decl: func_head func_body .
+
+    $default  reduce using rule 7 (func_defn_decl)
+
+
+State 21
+
+   11 func_head: res_id LEFT_OPEN_BRACKET . decl_plist RIGHT_OPEN_BRACKET
+
+    INTEGER  shift, and go to state 23
+    FLOAT    shift, and go to state 24
+    CHAR     shift, and go to state 25
+    VOID     shift, and go to state 50
+    STRUCT   shift, and go to state 26
+
+    $default  reduce using rule 21 (decl_plist)
+
+    decl_plist  go to state 51
+    decl_param  go to state 52
+    type        go to state 53
+
+
+State 22
+
+   12 res_id: result IDENTIFIER .
+
+    $default  reduce using rule 12 (res_id)
+
+
+State 23
+
+   31 type: INTEGER .
+
+    $default  reduce using rule 31 (type)
+
+
+State 24
+
+   32 type: FLOAT .
+
+    $default  reduce using rule 32 (type)
+
+
+State 25
+
+   33 type: CHAR .
+
+    $default  reduce using rule 33 (type)
+
+
+State 26
+
+   34 type: STRUCT . IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 54
+
+
+State 27
+
+    5 struct_decl: str_head LEFT_CURLY_BRACKET dslist . RIGHT_CURLY_BRACKET SEMICOLON
+   27 dslist: dslist . struct_declaration
+
+    RIGHT_CURLY_BRACKET  shift, and go to state 55
+    INTEGER              shift, and go to state 23
+    FLOAT                shift, and go to state 24
+    CHAR                 shift, and go to state 25
+    STRUCT               shift, and go to state 26
+
+    struct_declaration  go to state 56
+    type                go to state 29
+
+
+State 28
+
+   26 dslist: struct_declaration .
+
+    $default  reduce using rule 26 (dslist)
+
+
+State 29
+
+   29 struct_declaration: type . struct_list_id SEMICOLON
+
+    IDENTIFIER  shift, and go to state 57
+
+    struct_list_id  go to state 58
+    id_arr          go to state 59
+
+
+State 30
+
+   44 body: LEFT_CURLY_BRACKET . $@1 optional_stmt RIGHT_CURLY_BRACKET
+
+    $default  reduce using rule 43 ($@1)
+
+    $@1  go to state 60
+
+
+State 31
+
+   62 lhs: IDENTIFIER .
+   63    | IDENTIFIER . DOT IDENTIFIER
+   66 br_elist: IDENTIFIER . LEFT_CLOSED_BRACKET exp
+   67         | IDENTIFIER . DOT IDENTIFIER LEFT_CLOSED_BRACKET exp
+   94 func_call_head: IDENTIFIER .
+
+    LEFT_CLOSED_BRACKET  shift, and go to state 61
+    DOT                  shift, and go to state 62
+
+    LEFT_OPEN_BRACKET  reduce using rule 94 (func_call_head)
+    $default           reduce using rule 62 (lhs)
+
+
+State 32
+
+   59 ifexp: IF . LEFT_OPEN_BRACKET exp RIGHT_OPEN_BRACKET
+
+    LEFT_OPEN_BRACKET  shift, and go to state 63
+
+
+State 33
+
+   60 whileexp: WHILE . m_inter LEFT_OPEN_BRACKET exp RIGHT_OPEN_BRACKET
+
+    $default  reduce using rule 51 (m_inter)
+
+    m_inter  go to state 64
+
+
+State 34
+
+   55 matched_stmt: RETURN . exp SEMICOLON
+   56             | RETURN . SEMICOLON
+
+    LEFT_OPEN_BRACKET  shift, and go to state 65
+    IDENTIFIER         shift, and go to state 66
+    CHARACTER          shift, and go to state 67
+    NUMBER_INT         shift, and go to state 68
+    NUMBER_FLOAT       shift, and go to state 69
+    SEMICOLON          shift, and go to state 70
+    NOT                shift, and go to state 71
+
+    br_elist        go to state 72
+    exp             go to state 73
+    aa_exp          go to state 74
+    d_exp           go to state 75
+    pm_exp          go to state 76
+    t_exp           go to state 77
+    f_exp           go to state 78
+    func_call_head  go to state 48
+    func_call       go to state 79
+
+
+State 35
+
+    8 func_body: LEFT_CURLY_BRACKET optional_stmt . RIGHT_CURLY_BRACKET
+
+    RIGHT_CURLY_BRACKET  shift, and go to state 80
+
+
+State 36
+
+   58 matched_stmt: var_decl .
+
+    $default  reduce using rule 58 (matched_stmt)
+
+
+State 37
+
+   28 var_decl: declaration .
+
+    $default  reduce using rule 28 (var_decl)
+
+
+State 38
+
+   30 declaration: type . list_id SEMICOLON
+
+    IDENTIFIER  shift, and go to state 57
+
+    list_id  go to state 81
+    id_arr   go to state 82
+
+
+State 39
+
+   57 matched_stmt: body .
+
+    $default  reduce using rule 57 (matched_stmt)
+
+
+State 40
+
+    9 optional_stmt: stmt_list .
+   45 stmt_list: stmt_list . m_inter stmt
+
+    RIGHT_CURLY_BRACKET  reduce using rule 9 (optional_stmt)
+    $default             reduce using rule 51 (m_inter)
+
+    m_inter  go to state 83
+
+
+State 41
+
+   46 stmt_list: stmt .
+
+    $default  reduce using rule 46 (stmt_list)
+
+
+State 42
+
+   47 stmt: matched_stmt .
+
+    $default  reduce using rule 47 (stmt)
+
+
+State 43
+
+   48 stmt: ifexp . stmt
+   49     | ifexp . matched_stmt n_inter ELSE m_inter stmt
+
+    LEFT_CURLY_BRACKET  shift, and go to state 30
+    IDENTIFIER          shift, and go to state 31
+    INTEGER             shift, and go to state 23
+    FLOAT               shift, and go to state 24
+    CHAR                shift, and go to state 25
+    STRUCT              shift, and go to state 26
+    IF                  shift, and go to state 32
+    WHILE               shift, and go to state 33
+    RETURN              shift, and go to state 34
+
+    var_decl        go to state 36
+    declaration     go to state 37
+    type            go to state 38
+    body            go to state 39
+    stmt            go to state 84
+    matched_stmt    go to state 85
+    ifexp           go to state 43
+    whileexp        go to state 44
+    asg             go to state 45
+    lhs             go to state 46
+    br_elist        go to state 47
+    func_call_head  go to state 48
+    func_call       go to state 49
+
+
+State 44
+
+   52 matched_stmt: whileexp . body
+
+    LEFT_CURLY_BRACKET  shift, and go to state 30
+
+    body  go to state 86
+
+
+State 45
+
+   53 matched_stmt: asg . SEMICOLON
+
+    SEMICOLON  shift, and go to state 87
+
+
+State 46
+
+   61 asg: lhs . EQUALS exp
+
+    EQUALS  shift, and go to state 88
+
+
+State 47
+
+   64 lhs: br_elist . RIGHT_CLOSED_BRACKET
+   65 br_elist: br_elist . RIGHT_CLOSED_BRACKET LEFT_CLOSED_BRACKET exp
+
+    RIGHT_CLOSED_BRACKET  shift, and go to state 89
+
+
+State 48
+
+   95 func_call: func_call_head . LEFT_OPEN_BRACKET paramlist RIGHT_OPEN_BRACKET
+
+    LEFT_OPEN_BRACKET  shift, and go to state 90
+
+
+State 49
+
+   54 matched_stmt: func_call . SEMICOLON
+
+    SEMICOLON  shift, and go to state 91
+
+
+State 50
+
+   20 decl_plist: VOID .
+
+    $default  reduce using rule 20 (decl_plist)
+
+
+State 51
+
+   11 func_head: res_id LEFT_OPEN_BRACKET decl_plist . RIGHT_OPEN_BRACKET
+
+    RIGHT_OPEN_BRACKET  shift, and go to state 92
+
+
+State 52
+
+   18 decl_plist: decl_param . COMMA decl_plist
+   19           | decl_param .
+
+    COMMA  shift, and go to state 93
+
+    $default  reduce using rule 19 (decl_plist)
+
+
+State 53
+
+   22 decl_param: type . decl_ids
+
+    IDENTIFIER  shift, and go to state 94
+
+    decl_ids  go to state 95
+
+
+State 54
+
+   34 type: STRUCT IDENTIFIER .
+
+    $default  reduce using rule 34 (type)
+
+
+State 55
+
+    5 struct_decl: str_head LEFT_CURLY_BRACKET dslist RIGHT_CURLY_BRACKET . SEMICOLON
+
+    SEMICOLON  shift, and go to state 96
+
+
+State 56
+
+   27 dslist: dslist struct_declaration .
+
+    $default  reduce using rule 27 (dslist)
+
+
+State 57
+
+   39 id_arr: IDENTIFIER . br_dimlist
+   40       | IDENTIFIER .
+
+    LEFT_CLOSED_BRACKET  shift, and go to state 97
+
+    $default  reduce using rule 40 (id_arr)
+
+    br_dimlist  go to state 98
+
+
+State 58
+
+   29 struct_declaration: type struct_list_id . SEMICOLON
+   36 struct_list_id: struct_list_id . COMMA id_arr
+
+    SEMICOLON  shift, and go to state 99
+    COMMA      shift, and go to state 100
+
+
+State 59
+
+   35 struct_list_id: id_arr .
+
+    $default  reduce using rule 35 (struct_list_id)
+
+
+State 60
+
+   44 body: LEFT_CURLY_BRACKET $@1 . optional_stmt RIGHT_CURLY_BRACKET
+
+    LEFT_CURLY_BRACKET  shift, and go to state 30
+    IDENTIFIER          shift, and go to state 31
+    INTEGER             shift, and go to state 23
+    FLOAT               shift, and go to state 24
+    CHAR                shift, and go to state 25
+    STRUCT              shift, and go to state 26
+    IF                  shift, and go to state 32
+    WHILE               shift, and go to state 33
+    RETURN              shift, and go to state 34
+
+    $default  reduce using rule 10 (optional_stmt)
+
+    optional_stmt   go to state 101
+    var_decl        go to state 36
+    declaration     go to state 37
+    type            go to state 38
+    body            go to state 39
+    stmt_list       go to state 40
+    stmt            go to state 41
+    matched_stmt    go to state 42
+    ifexp           go to state 43
+    whileexp        go to state 44
+    asg             go to state 45
+    lhs             go to state 46
+    br_elist        go to state 47
+    func_call_head  go to state 48
+    func_call       go to state 49
+
+
+State 61
+
+   66 br_elist: IDENTIFIER LEFT_CLOSED_BRACKET . exp
+
+    LEFT_OPEN_BRACKET  shift, and go to state 65
+    IDENTIFIER         shift, and go to state 66
+    CHARACTER          shift, and go to state 67
+    NUMBER_INT         shift, and go to state 68
+    NUMBER_FLOAT       shift, and go to state 69
+    NOT                shift, and go to state 71
+
+    br_elist        go to state 72
+    exp             go to state 102
+    aa_exp          go to state 74
+    d_exp           go to state 75
+    pm_exp          go to state 76
+    t_exp           go to state 77
+    f_exp           go to state 78
+    func_call_head  go to state 48
+    func_call       go to state 79
+
+
+State 62
+
+   63 lhs: IDENTIFIER DOT . IDENTIFIER
+   67 br_elist: IDENTIFIER DOT . IDENTIFIER LEFT_CLOSED_BRACKET exp
+
+    IDENTIFIER  shift, and go to state 103
+
+
+State 63
+
+   59 ifexp: IF LEFT_OPEN_BRACKET . exp RIGHT_OPEN_BRACKET
+
+    LEFT_OPEN_BRACKET  shift, and go to state 65
+    IDENTIFIER         shift, and go to state 66
+    CHARACTER          shift, and go to state 67
+    NUMBER_INT         shift, and go to state 68
+    NUMBER_FLOAT       shift, and go to state 69
+    NOT                shift, and go to state 71
+
+    br_elist        go to state 72
+    exp             go to state 104
+    aa_exp          go to state 74
+    d_exp           go to state 75
+    pm_exp          go to state 76
+    t_exp           go to state 77
+    f_exp           go to state 78
+    func_call_head  go to state 48
+    func_call       go to state 79
+
+
+State 64
+
+   60 whileexp: WHILE m_inter . LEFT_OPEN_BRACKET exp RIGHT_OPEN_BRACKET
+
+    LEFT_OPEN_BRACKET  shift, and go to state 105
+
+
+State 65
+
+   93 f_exp: LEFT_OPEN_BRACKET . exp RIGHT_OPEN_BRACKET
+
+    LEFT_OPEN_BRACKET  shift, and go to state 65
+    IDENTIFIER         shift, and go to state 66
+    CHARACTER          shift, and go to state 67
+    NUMBER_INT         shift, and go to state 68
+    NUMBER_FLOAT       shift, and go to state 69
+    NOT                shift, and go to state 71
+
+    br_elist        go to state 72
+    exp             go to state 106
+    aa_exp          go to state 74
+    d_exp           go to state 75
+    pm_exp          go to state 76
+    t_exp           go to state 77
+    f_exp           go to state 78
+    func_call_head  go to state 48
+    func_call       go to state 79
+
+
+State 66
+
+   66 br_elist: IDENTIFIER . LEFT_CLOSED_BRACKET exp
+   67         | IDENTIFIER . DOT IDENTIFIER LEFT_CLOSED_BRACKET exp
+   89 f_exp: IDENTIFIER .
+   90      | IDENTIFIER . DOT IDENTIFIER
+   94 func_call_head: IDENTIFIER .
+
+    LEFT_CLOSED_BRACKET  shift, and go to state 61
+    DOT                  shift, and go to state 107
+
+    LEFT_OPEN_BRACKET  reduce using rule 94 (func_call_head)
+    $default           reduce using rule 89 (f_exp)
+
+
+State 67
+
+   87 f_exp: CHARACTER .
+
+    $default  reduce using rule 87 (f_exp)
+
+
+State 68
+
+   86 f_exp: NUMBER_INT .
+
+    $default  reduce using rule 86 (f_exp)
+
+
+State 69
+
+   88 f_exp: NUMBER_FLOAT .
+
+    $default  reduce using rule 88 (f_exp)
+
+
+State 70
+
+   56 matched_stmt: RETURN SEMICOLON .
+
+    $default  reduce using rule 56 (matched_stmt)
+
+
+State 71
+
+   79 d_exp: NOT . LEFT_OPEN_BRACKET exp RIGHT_OPEN_BRACKET
+
+    LEFT_OPEN_BRACKET  shift, and go to state 108
+
+
+State 72
+
+   65 br_elist: br_elist . RIGHT_CLOSED_BRACKET LEFT_CLOSED_BRACKET exp
+   91 f_exp: br_elist . RIGHT_CLOSED_BRACKET
+
+    RIGHT_CLOSED_BRACKET  shift, and go to state 109
+
+
+State 73
+
+   55 matched_stmt: RETURN exp . SEMICOLON
+   68 exp: exp . OR OR aa_exp
+
+    SEMICOLON  shift, and go to state 110
+    OR         shift, and go to state 111
+
+
+State 74
+
+   69 exp: aa_exp .
+   71 aa_exp: aa_exp . AND AND d_exp
+
+    AND  shift, and go to state 112
+
+    $default  reduce using rule 69 (exp)
+
+
+State 75
+
+   70 aa_exp: d_exp .
+
+    $default  reduce using rule 70 (aa_exp)
+
+
+State 76
+
+   72 d_exp: pm_exp .
+   73      | pm_exp . GREATER_THAN pm_exp
+   74      | pm_exp . NOT EQUALS pm_exp
+   75      | pm_exp . EQUALS EQUALS pm_exp
+   76      | pm_exp . LESS_THAN pm_exp
+   77      | pm_exp . LESS_THAN EQUALS pm_exp
+   78      | pm_exp . GREATER_THAN EQUALS pm_exp
+   80 pm_exp: pm_exp . PLUS t_exp
+   81       | pm_exp . MINUS t_exp
+
+    PLUS          shift, and go to state 113
+    MINUS         shift, and go to state 114
+    EQUALS        shift, and go to state 115
+    LESS_THAN     shift, and go to state 116
+    GREATER_THAN  shift, and go to state 117
+    NOT           shift, and go to state 118
+
+    $default  reduce using rule 72 (d_exp)
+
+
+State 77
+
+   82 pm_exp: t_exp .
+
+    $default  reduce using rule 82 (pm_exp)
+
+
+State 78
+
+   83 t_exp: f_exp . STAR t_exp
+   84      | f_exp . SLASH t_exp
+   85      | f_exp .
+
+    STAR   shift, and go to state 119
+    SLASH  shift, and go to state 120
+
+    $default  reduce using rule 85 (t_exp)
+
+
+State 79
+
+   92 f_exp: func_call .
+
+    $default  reduce using rule 92 (f_exp)
+
+
+State 80
+
+    8 func_body: LEFT_CURLY_BRACKET optional_stmt RIGHT_CURLY_BRACKET .
+
+    $default  reduce using rule 8 (func_body)
+
+
+State 81
+
+   30 declaration: type list_id . SEMICOLON
+   38 list_id: list_id . COMMA id_arr
+
+    SEMICOLON  shift, and go to state 121
+    COMMA      shift, and go to state 122
+
+
+State 82
+
+   37 list_id: id_arr .
+
+    $default  reduce using rule 37 (list_id)
+
+
+State 83
+
+   45 stmt_list: stmt_list m_inter . stmt
+
+    LEFT_CURLY_BRACKET  shift, and go to state 30
+    IDENTIFIER          shift, and go to state 31
+    INTEGER             shift, and go to state 23
+    FLOAT               shift, and go to state 24
+    CHAR                shift, and go to state 25
+    STRUCT              shift, and go to state 26
+    IF                  shift, and go to state 32
+    WHILE               shift, and go to state 33
+    RETURN              shift, and go to state 34
+
+    var_decl        go to state 36
+    declaration     go to state 37
+    type            go to state 38
+    body            go to state 39
+    stmt            go to state 123
+    matched_stmt    go to state 42
+    ifexp           go to state 43
+    whileexp        go to state 44
+    asg             go to state 45
+    lhs             go to state 46
+    br_elist        go to state 47
+    func_call_head  go to state 48
+    func_call       go to state 49
+
+
+State 84
+
+   48 stmt: ifexp stmt .
+
+    $default  reduce using rule 48 (stmt)
+
+
+State 85
+
+   47 stmt: matched_stmt .
+   49     | ifexp matched_stmt . n_inter ELSE m_inter stmt
+
+    ELSE      reduce using rule 50 (n_inter)
+    $default  reduce using rule 47 (stmt)
+
+    n_inter  go to state 124
+
+
+State 86
+
+   52 matched_stmt: whileexp body .
+
+    $default  reduce using rule 52 (matched_stmt)
+
+
+State 87
+
+   53 matched_stmt: asg SEMICOLON .
+
+    $default  reduce using rule 53 (matched_stmt)
+
+
+State 88
+
+   61 asg: lhs EQUALS . exp
+
+    LEFT_OPEN_BRACKET  shift, and go to state 65
+    IDENTIFIER         shift, and go to state 66
+    CHARACTER          shift, and go to state 67
+    NUMBER_INT         shift, and go to state 68
+    NUMBER_FLOAT       shift, and go to state 69
+    NOT                shift, and go to state 71
+
+    br_elist        go to state 72
+    exp             go to state 125
+    aa_exp          go to state 74
+    d_exp           go to state 75
+    pm_exp          go to state 76
+    t_exp           go to state 77
+    f_exp           go to state 78
+    func_call_head  go to state 48
+    func_call       go to state 79
+
+
+State 89
+
+   64 lhs: br_elist RIGHT_CLOSED_BRACKET .
+   65 br_elist: br_elist RIGHT_CLOSED_BRACKET . LEFT_CLOSED_BRACKET exp
+
+    LEFT_CLOSED_BRACKET  shift, and go to state 126
+
+    $default  reduce using rule 64 (lhs)
+
+
+State 90
+
+   95 func_call: func_call_head LEFT_OPEN_BRACKET . paramlist RIGHT_OPEN_BRACKET
+
+    LEFT_OPEN_BRACKET  shift, and go to state 65
+    IDENTIFIER         shift, and go to state 66
+    CHARACTER          shift, and go to state 67
+    NUMBER_INT         shift, and go to state 68
+    NUMBER_FLOAT       shift, and go to state 69
+    NOT                shift, and go to state 71
+
+    $default  reduce using rule 97 (paramlist)
+
+    br_elist        go to state 72
+    exp             go to state 127
+    aa_exp          go to state 74
+    d_exp           go to state 75
+    pm_exp          go to state 76
+    t_exp           go to state 77
+    f_exp           go to state 78
+    func_call_head  go to state 48
+    func_call       go to state 79
+    paramlist       go to state 128
+    plist           go to state 129
+
+
+State 91
+
+   54 matched_stmt: func_call SEMICOLON .
+
+    $default  reduce using rule 54 (matched_stmt)
+
+
+State 92
+
+   11 func_head: res_id LEFT_OPEN_BRACKET decl_plist RIGHT_OPEN_BRACKET .
+
+    $default  reduce using rule 11 (func_head)
+
+
+State 93
+
+   18 decl_plist: decl_param COMMA . decl_plist
+
+    INTEGER  shift, and go to state 23
+    FLOAT    shift, and go to state 24
+    CHAR     shift, and go to state 25
+    VOID     shift, and go to state 50
+    STRUCT   shift, and go to state 26
+
+    $default  reduce using rule 21 (decl_plist)
+
+    decl_plist  go to state 130
+    decl_param  go to state 52
+    type        go to state 53
+
+
+State 94
+
+   23 decl_ids: IDENTIFIER . br_param
+
+    LEFT_CLOSED_BRACKET  shift, and go to state 131
+
+    $default  reduce using rule 25 (br_param)
+
+    br_param  go to state 132
+
+
+State 95
+
+   22 decl_param: type decl_ids .
+
+    $default  reduce using rule 22 (decl_param)
+
+
+State 96
+
+    5 struct_decl: str_head LEFT_CURLY_BRACKET dslist RIGHT_CURLY_BRACKET SEMICOLON .
+
+    $default  reduce using rule 5 (struct_decl)
+
+
+State 97
+
+   41 br_dimlist: LEFT_CLOSED_BRACKET . NUMBER_INT RIGHT_CLOSED_BRACKET
+   42           | LEFT_CLOSED_BRACKET . NUMBER_INT RIGHT_CLOSED_BRACKET br_dimlist
+
+    NUMBER_INT  shift, and go to state 133
+
+
+State 98
+
+   39 id_arr: IDENTIFIER br_dimlist .
+
+    $default  reduce using rule 39 (id_arr)
+
+
+State 99
+
+   29 struct_declaration: type struct_list_id SEMICOLON .
+
+    $default  reduce using rule 29 (struct_declaration)
+
+
+State 100
+
+   36 struct_list_id: struct_list_id COMMA . id_arr
+
+    IDENTIFIER  shift, and go to state 57
+
+    id_arr  go to state 134
+
+
+State 101
+
+   44 body: LEFT_CURLY_BRACKET $@1 optional_stmt . RIGHT_CURLY_BRACKET
+
+    RIGHT_CURLY_BRACKET  shift, and go to state 135
+
+
+State 102
+
+   66 br_elist: IDENTIFIER LEFT_CLOSED_BRACKET exp .
+   68 exp: exp . OR OR aa_exp
+
+    OR  shift, and go to state 111
+
+    $default  reduce using rule 66 (br_elist)
+
+
+State 103
+
+   63 lhs: IDENTIFIER DOT IDENTIFIER .
+   67 br_elist: IDENTIFIER DOT IDENTIFIER . LEFT_CLOSED_BRACKET exp
+
+    LEFT_CLOSED_BRACKET  shift, and go to state 136
+
+    $default  reduce using rule 63 (lhs)
+
+
+State 104
+
+   59 ifexp: IF LEFT_OPEN_BRACKET exp . RIGHT_OPEN_BRACKET
+   68 exp: exp . OR OR aa_exp
+
+    RIGHT_OPEN_BRACKET  shift, and go to state 137
+    OR                  shift, and go to state 111
+
+
+State 105
+
+   60 whileexp: WHILE m_inter LEFT_OPEN_BRACKET . exp RIGHT_OPEN_BRACKET
+
+    LEFT_OPEN_BRACKET  shift, and go to state 65
+    IDENTIFIER         shift, and go to state 66
+    CHARACTER          shift, and go to state 67
+    NUMBER_INT         shift, and go to state 68
+    NUMBER_FLOAT       shift, and go to state 69
+    NOT                shift, and go to state 71
+
+    br_elist        go to state 72
+    exp             go to state 138
+    aa_exp          go to state 74
+    d_exp           go to state 75
+    pm_exp          go to state 76
+    t_exp           go to state 77
+    f_exp           go to state 78
+    func_call_head  go to state 48
+    func_call       go to state 79
+
+
+State 106
+
+   68 exp: exp . OR OR aa_exp
+   93 f_exp: LEFT_OPEN_BRACKET exp . RIGHT_OPEN_BRACKET
+
+    RIGHT_OPEN_BRACKET  shift, and go to state 139
+    OR                  shift, and go to state 111
+
+
+State 107
+
+   67 br_elist: IDENTIFIER DOT . IDENTIFIER LEFT_CLOSED_BRACKET exp
+   90 f_exp: IDENTIFIER DOT . IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 140
+
+
+State 108
+
+   79 d_exp: NOT LEFT_OPEN_BRACKET . exp RIGHT_OPEN_BRACKET
+
+    LEFT_OPEN_BRACKET  shift, and go to state 65
+    IDENTIFIER         shift, and go to state 66
+    CHARACTER          shift, and go to state 67
+    NUMBER_INT         shift, and go to state 68
+    NUMBER_FLOAT       shift, and go to state 69
+    NOT                shift, and go to state 71
+
+    br_elist        go to state 72
+    exp             go to state 141
+    aa_exp          go to state 74
+    d_exp           go to state 75
+    pm_exp          go to state 76
+    t_exp           go to state 77
+    f_exp           go to state 78
+    func_call_head  go to state 48
+    func_call       go to state 79
+
+
+State 109
+
+   65 br_elist: br_elist RIGHT_CLOSED_BRACKET . LEFT_CLOSED_BRACKET exp
+   91 f_exp: br_elist RIGHT_CLOSED_BRACKET .
+
+    LEFT_CLOSED_BRACKET  shift, and go to state 126
+
+    $default  reduce using rule 91 (f_exp)
+
+
+State 110
+
+   55 matched_stmt: RETURN exp SEMICOLON .
+
+    $default  reduce using rule 55 (matched_stmt)
+
+
+State 111
+
+   68 exp: exp OR . OR aa_exp
+
+    OR  shift, and go to state 142
+
+
+State 112
+
+   71 aa_exp: aa_exp AND . AND d_exp
+
+    AND  shift, and go to state 143
+
+
+State 113
+
+   80 pm_exp: pm_exp PLUS . t_exp
+
+    LEFT_OPEN_BRACKET  shift, and go to state 65
+    IDENTIFIER         shift, and go to state 66
+    CHARACTER          shift, and go to state 67
+    NUMBER_INT         shift, and go to state 68
+    NUMBER_FLOAT       shift, and go to state 69
+
+    br_elist        go to state 72
+    t_exp           go to state 144
+    f_exp           go to state 78
+    func_call_head  go to state 48
+    func_call       go to state 79
+
+
+State 114
+
+   81 pm_exp: pm_exp MINUS . t_exp
+
+    LEFT_OPEN_BRACKET  shift, and go to state 65
+    IDENTIFIER         shift, and go to state 66
+    CHARACTER          shift, and go to state 67
+    NUMBER_INT         shift, and go to state 68
+    NUMBER_FLOAT       shift, and go to state 69
+
+    br_elist        go to state 72
+    t_exp           go to state 145
+    f_exp           go to state 78
+    func_call_head  go to state 48
+    func_call       go to state 79
+
+
+State 115
+
+   75 d_exp: pm_exp EQUALS . EQUALS pm_exp
+
+    EQUALS  shift, and go to state 146
+
+
+State 116
+
+   76 d_exp: pm_exp LESS_THAN . pm_exp
+   77      | pm_exp LESS_THAN . EQUALS pm_exp
+
+    LEFT_OPEN_BRACKET  shift, and go to state 65
+    IDENTIFIER         shift, and go to state 66
+    CHARACTER          shift, and go to state 67
+    NUMBER_INT         shift, and go to state 68
+    NUMBER_FLOAT       shift, and go to state 69
+    EQUALS             shift, and go to state 147
+
+    br_elist        go to state 72
+    pm_exp          go to state 148
+    t_exp           go to state 77
+    f_exp           go to state 78
+    func_call_head  go to state 48
+    func_call       go to state 79
+
+
+State 117
+
+   73 d_exp: pm_exp GREATER_THAN . pm_exp
+   78      | pm_exp GREATER_THAN . EQUALS pm_exp
+
+    LEFT_OPEN_BRACKET  shift, and go to state 65
+    IDENTIFIER         shift, and go to state 66
+    CHARACTER          shift, and go to state 67
+    NUMBER_INT         shift, and go to state 68
+    NUMBER_FLOAT       shift, and go to state 69
+    EQUALS             shift, and go to state 149
+
+    br_elist        go to state 72
+    pm_exp          go to state 150
+    t_exp           go to state 77
+    f_exp           go to state 78
+    func_call_head  go to state 48
+    func_call       go to state 79
+
+
+State 118
+
+   74 d_exp: pm_exp NOT . EQUALS pm_exp
+
+    EQUALS  shift, and go to state 151
+
+
+State 119
+
+   83 t_exp: f_exp STAR . t_exp
+
+    LEFT_OPEN_BRACKET  shift, and go to state 65
+    IDENTIFIER         shift, and go to state 66
+    CHARACTER          shift, and go to state 67
+    NUMBER_INT         shift, and go to state 68
+    NUMBER_FLOAT       shift, and go to state 69
+
+    br_elist        go to state 72
+    t_exp           go to state 152
+    f_exp           go to state 78
+    func_call_head  go to state 48
+    func_call       go to state 79
+
+
+State 120
+
+   84 t_exp: f_exp SLASH . t_exp
+
+    LEFT_OPEN_BRACKET  shift, and go to state 65
+    IDENTIFIER         shift, and go to state 66
+    CHARACTER          shift, and go to state 67
+    NUMBER_INT         shift, and go to state 68
+    NUMBER_FLOAT       shift, and go to state 69
+
+    br_elist        go to state 72
+    t_exp           go to state 153
+    f_exp           go to state 78
+    func_call_head  go to state 48
+    func_call       go to state 79
+
+
+State 121
+
+   30 declaration: type list_id SEMICOLON .
+
+    $default  reduce using rule 30 (declaration)
+
+
+State 122
+
+   38 list_id: list_id COMMA . id_arr
+
+    IDENTIFIER  shift, and go to state 57
+
+    id_arr  go to state 154
+
+
+State 123
+
+   45 stmt_list: stmt_list m_inter stmt .
+
+    $default  reduce using rule 45 (stmt_list)
+
+
+State 124
+
+   49 stmt: ifexp matched_stmt n_inter . ELSE m_inter stmt
+
+    ELSE  shift, and go to state 155
+
+
+State 125
+
+   61 asg: lhs EQUALS exp .
+   68 exp: exp . OR OR aa_exp
+
+    OR  shift, and go to state 111
+
+    $default  reduce using rule 61 (asg)
+
+
+State 126
+
+   65 br_elist: br_elist RIGHT_CLOSED_BRACKET LEFT_CLOSED_BRACKET . exp
+
+    LEFT_OPEN_BRACKET  shift, and go to state 65
+    IDENTIFIER         shift, and go to state 66
+    CHARACTER          shift, and go to state 67
+    NUMBER_INT         shift, and go to state 68
+    NUMBER_FLOAT       shift, and go to state 69
+    NOT                shift, and go to state 71
+
+    br_elist        go to state 72
+    exp             go to state 156
+    aa_exp          go to state 74
+    d_exp           go to state 75
+    pm_exp          go to state 76
+    t_exp           go to state 77
+    f_exp           go to state 78
+    func_call_head  go to state 48
+    func_call       go to state 79
+
+
+State 127
+
+   68 exp: exp . OR OR aa_exp
+   98 plist: exp . COMMA plist
+   99      | exp .
+
+    OR     shift, and go to state 111
+    COMMA  shift, and go to state 157
+
+    $default  reduce using rule 99 (plist)
+
+
+State 128
+
+   95 func_call: func_call_head LEFT_OPEN_BRACKET paramlist . RIGHT_OPEN_BRACKET
+
+    RIGHT_OPEN_BRACKET  shift, and go to state 158
+
+
+State 129
+
+   96 paramlist: plist .
+
+    $default  reduce using rule 96 (paramlist)
+
+
+State 130
+
+   18 decl_plist: decl_param COMMA decl_plist .
+
+    $default  reduce using rule 18 (decl_plist)
+
+
+State 131
+
+   24 br_param: LEFT_CLOSED_BRACKET . NUMBER_INT RIGHT_CLOSED_BRACKET br_param
+
+    NUMBER_INT  shift, and go to state 159
+
+
+State 132
+
+   23 decl_ids: IDENTIFIER br_param .
+
+    $default  reduce using rule 23 (decl_ids)
+
+
+State 133
+
+   41 br_dimlist: LEFT_CLOSED_BRACKET NUMBER_INT . RIGHT_CLOSED_BRACKET
+   42           | LEFT_CLOSED_BRACKET NUMBER_INT . RIGHT_CLOSED_BRACKET br_dimlist
+
+    RIGHT_CLOSED_BRACKET  shift, and go to state 160
+
+
+State 134
+
+   36 struct_list_id: struct_list_id COMMA id_arr .
+
+    $default  reduce using rule 36 (struct_list_id)
+
+
+State 135
+
+   44 body: LEFT_CURLY_BRACKET $@1 optional_stmt RIGHT_CURLY_BRACKET .
+
+    $default  reduce using rule 44 (body)
+
+
+State 136
+
+   67 br_elist: IDENTIFIER DOT IDENTIFIER LEFT_CLOSED_BRACKET . exp
+
+    LEFT_OPEN_BRACKET  shift, and go to state 65
+    IDENTIFIER         shift, and go to state 66
+    CHARACTER          shift, and go to state 67
+    NUMBER_INT         shift, and go to state 68
+    NUMBER_FLOAT       shift, and go to state 69
+    NOT                shift, and go to state 71
+
+    br_elist        go to state 72
+    exp             go to state 161
+    aa_exp          go to state 74
+    d_exp           go to state 75
+    pm_exp          go to state 76
+    t_exp           go to state 77
+    f_exp           go to state 78
+    func_call_head  go to state 48
+    func_call       go to state 79
+
+
+State 137
+
+   59 ifexp: IF LEFT_OPEN_BRACKET exp RIGHT_OPEN_BRACKET .
+
+    $default  reduce using rule 59 (ifexp)
+
+
+State 138
+
+   60 whileexp: WHILE m_inter LEFT_OPEN_BRACKET exp . RIGHT_OPEN_BRACKET
+   68 exp: exp . OR OR aa_exp
+
+    RIGHT_OPEN_BRACKET  shift, and go to state 162
+    OR                  shift, and go to state 111
+
+
+State 139
+
+   93 f_exp: LEFT_OPEN_BRACKET exp RIGHT_OPEN_BRACKET .
+
+    $default  reduce using rule 93 (f_exp)
+
+
+State 140
+
+   67 br_elist: IDENTIFIER DOT IDENTIFIER . LEFT_CLOSED_BRACKET exp
+   90 f_exp: IDENTIFIER DOT IDENTIFIER .
+
+    LEFT_CLOSED_BRACKET  shift, and go to state 136
+
+    $default  reduce using rule 90 (f_exp)
+
+
+State 141
+
+   68 exp: exp . OR OR aa_exp
+   79 d_exp: NOT LEFT_OPEN_BRACKET exp . RIGHT_OPEN_BRACKET
+
+    RIGHT_OPEN_BRACKET  shift, and go to state 163
+    OR                  shift, and go to state 111
+
+
+State 142
+
+   68 exp: exp OR OR . aa_exp
+
+    LEFT_OPEN_BRACKET  shift, and go to state 65
+    IDENTIFIER         shift, and go to state 66
+    CHARACTER          shift, and go to state 67
+    NUMBER_INT         shift, and go to state 68
+    NUMBER_FLOAT       shift, and go to state 69
+    NOT                shift, and go to state 71
+
+    br_elist        go to state 72
+    aa_exp          go to state 164
+    d_exp           go to state 75
+    pm_exp          go to state 76
+    t_exp           go to state 77
+    f_exp           go to state 78
+    func_call_head  go to state 48
+    func_call       go to state 79
+
+
+State 143
+
+   71 aa_exp: aa_exp AND AND . d_exp
+
+    LEFT_OPEN_BRACKET  shift, and go to state 65
+    IDENTIFIER         shift, and go to state 66
+    CHARACTER          shift, and go to state 67
+    NUMBER_INT         shift, and go to state 68
+    NUMBER_FLOAT       shift, and go to state 69
+    NOT                shift, and go to state 71
+
+    br_elist        go to state 72
+    d_exp           go to state 165
+    pm_exp          go to state 76
+    t_exp           go to state 77
+    f_exp           go to state 78
+    func_call_head  go to state 48
+    func_call       go to state 79
+
+
+State 144
+
+   80 pm_exp: pm_exp PLUS t_exp .
+
+    $default  reduce using rule 80 (pm_exp)
+
+
+State 145
+
+   81 pm_exp: pm_exp MINUS t_exp .
+
+    $default  reduce using rule 81 (pm_exp)
+
+
+State 146
+
+   75 d_exp: pm_exp EQUALS EQUALS . pm_exp
+
+    LEFT_OPEN_BRACKET  shift, and go to state 65
+    IDENTIFIER         shift, and go to state 66
+    CHARACTER          shift, and go to state 67
+    NUMBER_INT         shift, and go to state 68
+    NUMBER_FLOAT       shift, and go to state 69
+
+    br_elist        go to state 72
+    pm_exp          go to state 166
+    t_exp           go to state 77
+    f_exp           go to state 78
+    func_call_head  go to state 48
+    func_call       go to state 79
+
+
+State 147
+
+   77 d_exp: pm_exp LESS_THAN EQUALS . pm_exp
+
+    LEFT_OPEN_BRACKET  shift, and go to state 65
+    IDENTIFIER         shift, and go to state 66
+    CHARACTER          shift, and go to state 67
+    NUMBER_INT         shift, and go to state 68
+    NUMBER_FLOAT       shift, and go to state 69
+
+    br_elist        go to state 72
+    pm_exp          go to state 167
+    t_exp           go to state 77
+    f_exp           go to state 78
+    func_call_head  go to state 48
+    func_call       go to state 79
+
+
+State 148
+
+   76 d_exp: pm_exp LESS_THAN pm_exp .
+   80 pm_exp: pm_exp . PLUS t_exp
+   81       | pm_exp . MINUS t_exp
+
+    PLUS   shift, and go to state 113
+    MINUS  shift, and go to state 114
+
+    $default  reduce using rule 76 (d_exp)
+
+
+State 149
+
+   78 d_exp: pm_exp GREATER_THAN EQUALS . pm_exp
+
+    LEFT_OPEN_BRACKET  shift, and go to state 65
+    IDENTIFIER         shift, and go to state 66
+    CHARACTER          shift, and go to state 67
+    NUMBER_INT         shift, and go to state 68
+    NUMBER_FLOAT       shift, and go to state 69
+
+    br_elist        go to state 72
+    pm_exp          go to state 168
+    t_exp           go to state 77
+    f_exp           go to state 78
+    func_call_head  go to state 48
+    func_call       go to state 79
+
+
+State 150
+
+   73 d_exp: pm_exp GREATER_THAN pm_exp .
+   80 pm_exp: pm_exp . PLUS t_exp
+   81       | pm_exp . MINUS t_exp
+
+    PLUS   shift, and go to state 113
+    MINUS  shift, and go to state 114
+
+    $default  reduce using rule 73 (d_exp)
+
+
+State 151
+
+   74 d_exp: pm_exp NOT EQUALS . pm_exp
+
+    LEFT_OPEN_BRACKET  shift, and go to state 65
+    IDENTIFIER         shift, and go to state 66
+    CHARACTER          shift, and go to state 67
+    NUMBER_INT         shift, and go to state 68
+    NUMBER_FLOAT       shift, and go to state 69
+
+    br_elist        go to state 72
+    pm_exp          go to state 169
+    t_exp           go to state 77
+    f_exp           go to state 78
+    func_call_head  go to state 48
+    func_call       go to state 79
+
+
+State 152
+
+   83 t_exp: f_exp STAR t_exp .
+
+    $default  reduce using rule 83 (t_exp)
+
+
+State 153
+
+   84 t_exp: f_exp SLASH t_exp .
+
+    $default  reduce using rule 84 (t_exp)
+
+
+State 154
+
+   38 list_id: list_id COMMA id_arr .
+
+    $default  reduce using rule 38 (list_id)
+
+
+State 155
+
+   49 stmt: ifexp matched_stmt n_inter ELSE . m_inter stmt
+
+    $default  reduce using rule 51 (m_inter)
+
+    m_inter  go to state 170
+
+
+State 156
+
+   65 br_elist: br_elist RIGHT_CLOSED_BRACKET LEFT_CLOSED_BRACKET exp .
+   68 exp: exp . OR OR aa_exp
+
+    OR  shift, and go to state 111
+
+    $default  reduce using rule 65 (br_elist)
+
+
+State 157
+
+   98 plist: exp COMMA . plist
+
+    LEFT_OPEN_BRACKET  shift, and go to state 65
+    IDENTIFIER         shift, and go to state 66
+    CHARACTER          shift, and go to state 67
+    NUMBER_INT         shift, and go to state 68
+    NUMBER_FLOAT       shift, and go to state 69
+    NOT                shift, and go to state 71
+
+    br_elist        go to state 72
+    exp             go to state 127
+    aa_exp          go to state 74
+    d_exp           go to state 75
+    pm_exp          go to state 76
+    t_exp           go to state 77
+    f_exp           go to state 78
+    func_call_head  go to state 48
+    func_call       go to state 79
+    plist           go to state 171
+
+
+State 158
+
+   95 func_call: func_call_head LEFT_OPEN_BRACKET paramlist RIGHT_OPEN_BRACKET .
+
+    $default  reduce using rule 95 (func_call)
+
+
+State 159
+
+   24 br_param: LEFT_CLOSED_BRACKET NUMBER_INT . RIGHT_CLOSED_BRACKET br_param
+
+    RIGHT_CLOSED_BRACKET  shift, and go to state 172
+
+
+State 160
+
+   41 br_dimlist: LEFT_CLOSED_BRACKET NUMBER_INT RIGHT_CLOSED_BRACKET .
+   42           | LEFT_CLOSED_BRACKET NUMBER_INT RIGHT_CLOSED_BRACKET . br_dimlist
+
+    LEFT_CLOSED_BRACKET  shift, and go to state 97
+
+    $default  reduce using rule 41 (br_dimlist)
+
+    br_dimlist  go to state 173
+
+
+State 161
+
+   67 br_elist: IDENTIFIER DOT IDENTIFIER LEFT_CLOSED_BRACKET exp .
+   68 exp: exp . OR OR aa_exp
+
+    OR  shift, and go to state 111
+
+    $default  reduce using rule 67 (br_elist)
+
+
+State 162
+
+   60 whileexp: WHILE m_inter LEFT_OPEN_BRACKET exp RIGHT_OPEN_BRACKET .
+
+    $default  reduce using rule 60 (whileexp)
+
+
+State 163
+
+   79 d_exp: NOT LEFT_OPEN_BRACKET exp RIGHT_OPEN_BRACKET .
+
+    $default  reduce using rule 79 (d_exp)
+
+
+State 164
+
+   68 exp: exp OR OR aa_exp .
+   71 aa_exp: aa_exp . AND AND d_exp
+
+    AND  shift, and go to state 112
+
+    $default  reduce using rule 68 (exp)
+
+
+State 165
+
+   71 aa_exp: aa_exp AND AND d_exp .
+
+    $default  reduce using rule 71 (aa_exp)
+
+
+State 166
+
+   75 d_exp: pm_exp EQUALS EQUALS pm_exp .
+   80 pm_exp: pm_exp . PLUS t_exp
+   81       | pm_exp . MINUS t_exp
+
+    PLUS   shift, and go to state 113
+    MINUS  shift, and go to state 114
+
+    $default  reduce using rule 75 (d_exp)
+
+
+State 167
+
+   77 d_exp: pm_exp LESS_THAN EQUALS pm_exp .
+   80 pm_exp: pm_exp . PLUS t_exp
+   81       | pm_exp . MINUS t_exp
+
+    PLUS   shift, and go to state 113
+    MINUS  shift, and go to state 114
+
+    $default  reduce using rule 77 (d_exp)
+
+
+State 168
+
+   78 d_exp: pm_exp GREATER_THAN EQUALS pm_exp .
+   80 pm_exp: pm_exp . PLUS t_exp
+   81       | pm_exp . MINUS t_exp
+
+    PLUS   shift, and go to state 113
+    MINUS  shift, and go to state 114
+
+    $default  reduce using rule 78 (d_exp)
+
+
+State 169
+
+   74 d_exp: pm_exp NOT EQUALS pm_exp .
+   80 pm_exp: pm_exp . PLUS t_exp
+   81       | pm_exp . MINUS t_exp
+
+    PLUS   shift, and go to state 113
+    MINUS  shift, and go to state 114
+
+    $default  reduce using rule 74 (d_exp)
+
+
+State 170
+
+   49 stmt: ifexp matched_stmt n_inter ELSE m_inter . stmt
+
+    LEFT_CURLY_BRACKET  shift, and go to state 30
+    IDENTIFIER          shift, and go to state 31
+    INTEGER             shift, and go to state 23
+    FLOAT               shift, and go to state 24
+    CHAR                shift, and go to state 25
+    STRUCT              shift, and go to state 26
+    IF                  shift, and go to state 32
+    WHILE               shift, and go to state 33
+    RETURN              shift, and go to state 34
+
+    var_decl        go to state 36
+    declaration     go to state 37
+    type            go to state 38
+    body            go to state 39
+    stmt            go to state 174
+    matched_stmt    go to state 42
+    ifexp           go to state 43
+    whileexp        go to state 44
+    asg             go to state 45
+    lhs             go to state 46
+    br_elist        go to state 47
+    func_call_head  go to state 48
+    func_call       go to state 49
+
+
+State 171
+
+   98 plist: exp COMMA plist .
+
+    $default  reduce using rule 98 (plist)
+
+
+State 172
+
+   24 br_param: LEFT_CLOSED_BRACKET NUMBER_INT RIGHT_CLOSED_BRACKET . br_param
+
+    LEFT_CLOSED_BRACKET  shift, and go to state 131
+
+    $default  reduce using rule 25 (br_param)
+
+    br_param  go to state 175
+
+
+State 173
+
+   42 br_dimlist: LEFT_CLOSED_BRACKET NUMBER_INT RIGHT_CLOSED_BRACKET br_dimlist .
+
+    $default  reduce using rule 42 (br_dimlist)
+
+
+State 174
+
+   49 stmt: ifexp matched_stmt n_inter ELSE m_inter stmt .
+
+    $default  reduce using rule 49 (stmt)
+
+
+State 175
+
+   24 br_param: LEFT_CLOSED_BRACKET NUMBER_INT RIGHT_CLOSED_BRACKET br_param .
+
+    $default  reduce using rule 24 (br_param)

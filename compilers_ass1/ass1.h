@@ -1,0 +1,9 @@
+#define IDENTIFIER 61
+#define NUMBER 62
+#define OPERATOR 63
+#define STRING 64
+#define LEFT_BRACKET 65
+#define RIGHT_BRACKET 66
+#define COMMA 67
+#define SEMICOLON 68
+#define STAR 69

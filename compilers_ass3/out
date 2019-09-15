@@ -1,0 +1,758 @@
+4,11d3
+< 	#include <iostream>
+< 	#include "definition.h"
+< 	using namespace std;
+< 
+< 	vector<func_name_table> global_func;
+< 	int active_func_ptr = -1, call_func_ptr = -1, level = 0, namptr = -1;
+< 	bool found;
+< 
+13,21d4
+< 	int yylex();
+< 	void patchtype(enum t type,vector <variable> &namelist,string name, int level);
+< 	void error (string err);
+< 	int coercible(enum t type1, enum t type2);
+< 	enum t not_compatible(enum t type);
+< 	enum t compare_types(enum t type1,enum t type2);
+< 	bool compatible_arithop(enum t type1, enum t type2);
+< 	void search_func(string name, bool &found, int &namptr);
+< 	void enter_func(string name, enum t type, int &namptr);
+23,29d5
+< %union
+< {
+< 	res* reslt;
+< 	string* val;
+< 	variable * var;
+< 	vector<int> *list;
+< 	int int_val;
+31d6
+< }
+38,39c13,14
+< %token <val> IDENTIFIER
+< %token <int_val> NUMBER_INT
+---
+> %token IDENTIFIER
+> %token NUMBER_INT
+53,58d27
+< %type <reslt> result type list_id elist br_elist;
+< %type <var> id_arr exp t_exp f_exp pm_exp lhs aa_exp d_exp func_call;
+< %type <list> br_dimlist;
+< %type <val> decl_ids;
+< %type <int_val> paramlist plist;
+< 
+72,75d40
+< 													{
+< 														active_func_ptr = -1;
+< 														level = 0;
+< 													}
+92,121c57,63
+< 															{
+< 																level = 2;
+< 															}
+< 				;
+< 
+< res_id:				result mult_star IDENTIFIER	{
+< 													search_func($3, found, namptr);
+< 													if(found)
+< 													{
+< 														error("Function already declared");
+< 													}
+< 													else
+< 													{
+< 														enter_func($3, $1->type, namptr);
+< 													}
+< 													active_func_ptr = namptr;
+< 													level = 1;
+< 												}
+< 				;
+< 
+< result:				INTEGER				
+< 								{
+< 									$$ = new res;
+< 									$$->type = INT;
+< 								}
+< 				|	FLOAT				
+< 								{
+< 									$$ = new res;
+< 									$$->type = REAL;
+< 								}
+---
+> 				;
+> 
+> res_id:				result mult_star IDENTIFIER
+> 				;
+> 
+> result:				INTEGER										
+> 				|	FLOAT			
+123,126d64
+< 								{
+< 									$$ = new res;
+< 									$$->type = CHA;
+< 								}
+128,136c66
+< 								{
+< 									$$ = new res;
+< 									$$->type = VOI;
+< 								}
+< 				|	STRUCT IDENTIFIER	{
+< 											$$ = new res;
+< 											$$->type = STRUC;
+< 											$$->struct_name = *$2;
+< 										}
+---
+> 				|	STRUCT IDENTIFIER	
+146,156d75
+< 									{
+< 										search_param($2, active_func_ptr, found, pnptr);
+< 										if(found)
+< 										{
+< 											error("Parameter already declared");
+< 										}
+< 										else
+< 										{
+< 											enter_param($2, $1->type, active_func_ptr);
+< 										}
+< 									}
+178,184c97
+< 												{
+< 													if($1->type!=STRUC)
+< 														patchtype ($1->type,$2->namelist,"", level);
+< 													else 
+< 														patchtype($1->type,$2->namelist,$1->struct_name, level);   //todo //function table variablelist and its level
+< 												}		
+< 				;								
+---
+> 												
+187,195c100
+< 								{
+< 									$$ = new res;
+< 									$$->type = INT;
+< 								}
+< 				|	FLOAT		
+< 								{
+< 									$$ = new res;
+< 									$$->type = REAL;
+< 								}	
+---
+> 				|	FLOAT			
+197,200d101
+< 								{
+< 									$$ = new res;
+< 									$$->type = CHA;
+< 								}
+202,279c103,111
+< 								{
+< 									$$ = new res;
+< 									$$->type = STRUC;
+< 									$$->struct_name = *$2;
+< 								}
+< 				;
+< 
+< list_id:			id_arr														
+< 							{
+< 								search_var($1, active_func_ptr, level, found, vn);
+< 								$$=new res;
+< 								if(found && vn->level == level)
+< 								{
+< 									error("Variable already declared at same level");
+< 								}
+< 								else if(level == 2)
+< 								{
+< 									search_param($1, active_func_ptr, found, pn);
+< 									if(found)
+< 									{
+< 										error("Redeclaration of parameter as a variable");
+< 									}
+< 									else
+< 									{
+< 										enter_var($1, level, active_func_ptr, vnptr);
+< 										($$->namelist).push_back(vnptr);
+< 									}
+< 								}
+< 								else
+< 								{
+< 									enter_var($1, level, active_func_ptr, vnptr);
+< 									($$->namelist).push_back(vnptr);
+< 								}
+< 							}
+< 				| 	list_id COMMA id_arr														
+< 							{
+< 								search_var($1, active_func_ptr, level, found, vn);
+< 								$$=new res;
+< 								$$->namelist = $1->namelist;
+< 								if(found && vn->level == level)
+< 								{
+< 									error("Variable already declared at same level");
+< 								}
+< 								else if(level == 2)
+< 								{
+< 									search_param($1, active_func_ptr, found, pn);
+< 									if(found)
+< 									{
+< 										error("Redeclaration of parameter as a variable");
+< 									}
+< 									else
+< 									{
+< 										enter_var($1, level, active_func_ptr, vnptr);
+< 										($$->namelist).push_back(vnptr);
+< 									}
+< 								}
+< 								else
+< 								{
+< 									enter_var($1, level, active_func_ptr, vnptr);
+< 									($$->namelist).push_back(vnptr);
+< 								}
+< 							}
+< 				;
+< 
+< id_arr:				mult_star IDENTIFIER EQUALS exp		{//doubt
+< 														}
+< 				|	mult_star IDENTIFIER br_dimlist	
+< 																			{
+< 																				$$ = new variable;
+< 																				$$->name = *$2;
+< 																				$$->type = 1;
+< 																				$$->var_type = 1; 
+< 																				$$->dimlist = *$3;
+< 
+< 																			}	
+< 				|	mult_star IDENTIFIER br_dimlist EQUALS LEFT_CURLY_BRACKET elist RIGHT_CURLY_BRACKET			{
+< 																												//doubt
+< 																												}
+---
+> 				;
+> 
+> list_id:			id_arr							
+> 				| 	list_id COMMA id_arr						
+> 				;
+> 
+> id_arr:				mult_star IDENTIFIER EQUALS exp		
+> 				|	mult_star IDENTIFIER br_dimlist		
+> 				|	mult_star IDENTIFIER br_dimlist EQUALS LEFT_CURLY_BRACKET elist RIGHT_CURLY_BRACKET
+281,286d112
+< 							{
+< 								$$ = new variable;
+< 								$$->name = *$2;
+< 								$$->type = 0;
+< 								$$->var_type = 1;    //todo level 
+< 							}
+293,297c119
+< br_dimlist:			LEFT_CLOSED_BRACKET NUMBER_INT RIGHT_CLOSED_BRACKET		
+< 																{
+< 																	$$ = new vector<int>;
+< 																	(*$$).insert((*$$).begin(),$2);
+< 																}
+---
+> br_dimlist:			LEFT_CLOSED_BRACKET NUMBER_INT RIGHT_CLOSED_BRACKET																
+299,303d120
+< 																			{
+< 																				$$ = new vector<int>;
+< 																				(*$$) = *$4;
+< 																				(*$$).insert((*$$).begin(),$2);
+< 																			}
+306,310c123
+< body:				{level++;}LEFT_CURLY_BRACKET optional_stmt RIGHT_CURLY_BRACKET
+< 												{
+< 													delete_var_list(active_func_ptr, level);
+< 													level--;
+< 												}
+---
+> body:				LEFT_CURLY_BRACKET optional_stmt RIGHT_CURLY_BRACKET
+329,333c142
+< ifexp:				IF exp    		 
+< 					{
+< 						if($2->eletype==CHAR||$2->eletype==ERRORTYPE)
+< 							error("Wrong type in IF statement");
+< 					}
+---
+> ifexp:				IF exp    		
+336,340c145
+< whileexp:			WHILE exp							{
+< 								if($2->eletype==CHAR||$2->eletype==ERRORTYPE)
+< 									error("Wrong type in WHILE statement");
+< 
+< 							}
+---
+> whileexp:			WHILE exp							
+343,347c148
+< asg:				lhs EQUALS exp				{
+< 									if($1->eletype!=ERRORTYPE && $3->eletype!=ERRORTYPE)
+< 										if(!coercible($1->eletype , $3->eletype))
+< 											error("TYPE MISMATCH");
+< 								}
+---
+> asg:				lhs EQUALS exp				
+351,371d151
+< 												{
+< 													$$ = new variable;
+< 													search_var($1, active_func_ptr, level, found, vn);
+< 													if(!found)
+< 													{
+< 														search_param($1, active_func_ptr, found, pn);
+< 														if(!found)
+< 														{
+< 															$$->eletype = ERRORTYPE;
+< 															error("Identifier " + $1 + " not declared");
+< 														}
+< 														else
+< 														{
+< 															$$->eletype = pn->type;
+< 														}
+< 													}
+< 													else
+< 													{
+< 														$$->eletype = vn->type;
+< 													}
+< 												}
+373,375d152
+< 												{
+< 													//doubt multistar
+< 												}
+377,379d153
+< 												{
+< 													//doubt
+< 												}
+383,458c157,166
+< br_elist:			LEFT_CLOSED_BRACKET exp RIGHT_CLOSED_BRACKET				{
+< 																						$$ = new res;	
+< 																						if($2->eletype != INT)
+< 																						{
+< 																							$$->type = ERRORTYPE;
+< 																							error("Dimension not an integer.");
+< 																						}
+< 																						else
+< 																						{
+< 																							$$->type = INT;
+< 																							$$->dimnum = 1;
+< 																						}
+< 																					}				
+< 				|	LEFT_CLOSED_BRACKET exp RIGHT_CLOSED_BRACKET br_elist			{
+< 																						$$ = new res;	
+< 																						if($2->eletype != INT || $4->type != INT)
+< 																						{
+< 																							$$->type = ERRORTYPE;
+< 																							error("Dimension not an integer.");
+< 																						}
+< 																						else
+< 																						{
+< 																							$$->type = INT;
+< 																							$$->dimnum = $4->dimnum + 1;
+< 																						}
+< 																					}				
+< 				;
+< 
+< exp:				exp OR OR aa_exp												{
+< 																						$$ = new variable;
+< 																						if($1->eletype != ERRORTYPE && $4->eletype != ERRORTYPE)
+< 																						{
+< 																							if(!coercible($1->eletype, $4->eletype) || !compatible_arithop($1->eletype, $4->eletype))
+< 																							{
+< 																								error("Type mismatch");
+< 																								$$->eletype = ERRORTYPE;
+< 																							}
+< 																							else
+< 																							{
+< 																								$$->eletype = BOOL;
+< 																							}
+< 																						}
+< 																						else
+< 																						{
+< 																							$$->eletype = ERRORTYPE;
+< 																						}
+< 																					}
+< 				|	aa_exp															{
+< 																						$$ = new variable;
+< 																						$$->eletype = $1->eletype;
+< 																					}
+< 				;
+< 
+< aa_exp:				d_exp															{
+< 																						$$ = new variable;
+< 																						$$->eletype  = $1->eletype;
+< 																					}
+< 				|	aa_exp AND AND d_exp 											{
+< 																						$$ = new variable;
+< 																						if($1->eletype != ERRORTYPE && $4->eletype != ERRORTYPE)
+< 																						{
+< 																							if(!coercible($1->eletype, $4->eletype) || !compatible_arithop($1->eletype, $4->eletype))
+< 																							{
+< 																								error("Type mismatch");
+< 																								$$->eletype = ERRORTYPE;
+< 																							}
+< 																							else
+< 																							{
+< 																								$$->eletype = BOOL;
+< 																							}
+< 																						}
+< 																						else
+< 																						{
+< 																							$$->eletype = ERRORTYPE;
+< 																						}
+< 																					}							
+---
+> br_elist:			LEFT_CLOSED_BRACKET exp RIGHT_CLOSED_BRACKET																		
+> 				|	LEFT_CLOSED_BRACKET exp RIGHT_CLOSED_BRACKET br_elist																
+> 				;
+> 
+> exp:				exp OR OR aa_exp	
+> 				|	aa_exp												
+> 				;
+> 
+> aa_exp:				d_exp										
+> 				|	aa_exp AND AND d_exp 																		
+461,680c169,190
+< d_exp:				pm_exp															{
+< 																						$$ = new variable;
+< 																						$$->eletype = $1->eletype;
+< 																					}
+< 				|	pm_exp GREATER_THAN pm_exp										{
+< 																						$$ = new variable;
+< 																						if($1->eletype != ERRORTYPE && $3->eletype != ERRORTYPE)
+< 																						{
+< 																							if(!coercible($1->eletype, $3->eletype) || !compatible_arithop($1->eletype, $3->eletype))
+< 																							{
+< 																								error("Type mismatch");
+< 																								$$->eletype = ERRORTYPE;
+< 																							}
+< 																							else
+< 																							{
+< 																								$$->eletype = BOOL;
+< 																							}
+< 																						}
+< 																						else
+< 																						{
+< 																							$$->eletype = ERRORTYPE;
+< 																						}
+< 																					}							
+< 				|	pm_exp NOT EQUALS pm_exp										{
+< 																						$$ = new variable;
+< 																						if($1->eletype != ERRORTYPE && $4->eletype != ERRORTYPE)
+< 																						{
+< 																							if(!coercible($1->eletype, $4->eletype) || !compatible_arithop($1->eletype, $4->eletype))
+< 																							{
+< 																								error("Type mismatch");
+< 																								$$->eletype = ERRORTYPE;
+< 																							}
+< 																							else
+< 																							{
+< 																								$$->eletype = BOOL;
+< 																							}
+< 																						}
+< 																						else
+< 																						{
+< 																							$$->eletype = ERRORTYPE;
+< 																						}
+< 																					}		
+< 				|	pm_exp EQUALS EQUALS pm_exp										{
+< 																						$$ = new variable;
+< 																						if($1->eletype != ERRORTYPE && $4->eletype != ERRORTYPE)
+< 																						{
+< 																							if(!coercible($1->eletype, $4->eletype) || !compatible_arithop($1->eletype, $4->eletype))
+< 																							{
+< 																								error("Type mismatch");
+< 																								$$->eletype = ERRORTYPE;
+< 																							}
+< 																							else
+< 																							{
+< 																								$$->eletype = BOOL;
+< 																							}
+< 																						}
+< 																						else
+< 																						{
+< 																							$$->eletype = ERRORTYPE;
+< 																						}
+< 																					}		
+< 				|	pm_exp LESS_THAN pm_exp											{
+< 																						$$ = new variable;
+< 																						if($1->eletype != ERRORTYPE && $3->eletype != ERRORTYPE)
+< 																						{
+< 																							if(!coercible($1->eletype, $3->eletype) || !compatible_arithop($1->eletype, $3->eletype))
+< 																							{
+< 																								error("Type mismatch");
+< 																								$$->eletype = ERRORTYPE;
+< 																							}
+< 																							else
+< 																							{
+< 																								$$->eletype = BOOL;
+< 																							}
+< 																						}
+< 																						else
+< 																						{
+< 																							$$->eletype = ERRORTYPE;
+< 																						}
+< 																					}
+< 				|	pm_exp LESS_THAN EQUALS pm_exp									{
+< 																						$$ = new variable;
+< 																						if($1->eletype != ERRORTYPE && $4->eletype != ERRORTYPE)
+< 																						{
+< 																							if(!coercible($1->eletype, $4->eletype) || !compatible_arithop($1->eletype, $4->eletype))
+< 																							{
+< 																								error("Type mismatch");
+< 																								$$->eletype = ERRORTYPE;
+< 																							}
+< 																							else
+< 																							{
+< 																								$$->eletype = BOOL;
+< 																							}
+< 																						}
+< 																						else
+< 																						{
+< 																							$$->eletype = ERRORTYPE;
+< 																						}
+< 																					}			
+< 				|	pm_exp GREATER_THAN EQUALS pm_exp								{
+< 																						$$ = new variable;
+< 																						if($1->eletype != ERRORTYPE && $4->eletype != ERRORTYPE)
+< 																						{
+< 																							if(!coercible($1->eletype, $4->eletype) || !compatible_arithop($1->eletype, $4->eletype))
+< 																							{
+< 																								error("Type mismatch");
+< 																								$$->eletype = ERRORTYPE;
+< 																							}
+< 																							else
+< 																							{
+< 																								$$->eletype = BOOL;
+< 																							}
+< 																						}
+< 																						else
+< 																						{
+< 																							$$->eletype = ERRORTYPE;
+< 																						}
+< 																					}			
+< 				|	NOT LEFT_OPEN_BRACKET exp RIGHT_OPEN_BRACKET					{
+< 																						$$ = new variable;
+< 																						$$->type = not_compatible($3->eletype);
+< 																					}					
+< 				;
+< 
+< pm_exp:				pm_exp PLUS t_exp												{
+< 																						$$ = new variable;
+< 																						if($1->eletype != ERRORTYPE && $3->eletype != ERRORTYPE)
+< 																						{
+< 																							if(!coercible($1->eletype, $3->eletype) || !compatible_arithop($1->eletype, $3->eletype))
+< 																							{
+< 																								error("Type mismatch");
+< 																								$$->eletype = ERRORTYPE;
+< 																							}
+< 																							else
+< 																							{
+< 																								$$->eletype = compare_types($1->eletype, $3->eletype);
+< 																							}
+< 																						}
+< 																						else
+< 																						{
+< 																							$$->eletype = ERRORTYPE;
+< 																						}
+< 																					}
+< 				|	pm_exp MINUS t_exp												{
+< 																						$$ = new variable;
+< 																						if($1->eletype != ERRORTYPE && $3->eletype != ERRORTYPE)
+< 																						{
+< 																							if(!coercible($1->eletype, $3->eletype) || !compatible_arithop($1->eletype, $3->eletype))
+< 																							{
+< 																								error("Type mismatch");
+< 																								$$->eletype = ERRORTYPE;
+< 																							}
+< 																							else
+< 																							{
+< 																								$$->eletype = compare_types($1->eletype,$3->eletype);																								
+< 																							}
+< 																						}
+< 																						else
+< 																						{
+< 																							$$->eletype = ERRORTYPE;
+< 																						}
+< 																					}				
+< 				|	t_exp															{
+< 																						$$ = new variable;
+< 																						$$->eletype = $1->eletype;
+< 																					}
+< 				;
+< 
+< t_exp:				f_exp STAR t_exp												{
+< 																						$$ = new variable;
+< 																						if($1->eletype != ERRORTYPE && $3->eletype != ERRORTYPE)
+< 																						{
+< 																							if(!coercible($1->eletype, $3->eletype) || !compatible_arithop($1->eletype, $3->eletype))
+< 																							{
+< 																								error("Type mismatch");
+< 																								$$->eletype = ERRORTYPE;
+< 																							}
+< 																							else
+< 																							{
+< 																								$$->eletype = compare_types($1->eletype,$3->eletype);																								
+< 																							}
+< 																						}
+< 																						else
+< 																						{
+< 																							$$->eletype = ERRORTYPE;
+< 																						}
+< 																					}
+< 				|	f_exp SLASH t_exp												{
+< 																						$$ = new variable;
+< 																						if($1->eletype != ERRORTYPE && $3->eletype != ERRORTYPE)
+< 																						{
+< 																							if(!coercible($1->eletype, $3->eletype) || !compatible_arithop($1->eletype, $3->eletype))
+< 																							{
+< 																								error("Type mismatch");
+< 																								$$->eletype = ERRORTYPE;
+< 																							}
+< 																							else
+< 																							{
+< 																								$$->eletype = compare_types($1->eletype,$3->eletype);																								
+< 																							}
+< 																						}
+< 																						else
+< 																						{
+< 																							$$->eletype = ERRORTYPE;
+< 																						}
+< 																					}		
+< 				|	f_exp															{
+< 																						$$ = new variable;
+< 																						$$->eletype = $1->eletype;
+< 																					}						
+< 				;
+< 
+< f_exp:				NUMBER_INT								{
+< 																$$ = new variable;
+< 																$$->eletype = INT;
+< 															}
+< 				|	NUMBER_FLOAT							{	
+< 																$$ = new variable;
+< 																$$->eletype = REAL;
+< 															}
+---
+> d_exp:				pm_exp																	
+> 				|	pm_exp GREATER_THAN pm_exp																	
+> 				|	pm_exp NOT EQUALS pm_exp												
+> 				|	pm_exp EQUALS EQUALS pm_exp												
+> 				|	pm_exp LESS_THAN pm_exp											
+> 				|	pm_exp LESS_THAN EQUALS pm_exp												
+> 				|	pm_exp GREATER_THAN EQUALS pm_exp											
+> 				|	NOT LEFT_OPEN_BRACKET exp RIGHT_OPEN_BRACKET										
+> 				;
+> 
+> pm_exp:				pm_exp PLUS t_exp																		
+> 				|	pm_exp MINUS t_exp																
+> 				|	t_exp
+> 				;
+> 
+> t_exp:				f_exp STAR t_exp																
+> 				|	f_exp SLASH t_exp														
+> 				|	f_exp																					
+> 				;
+> 
+> f_exp:				NUMBER_INT
+> 				|	NUMBER_FLOAT			
+683,687c193
+< 				|	lhs
+< 															{
+< 																$$ = new variable;
+< 																$$->eletype = $1->eletype;
+< 															}
+---
+> 				|	IDENTIFIER
+692,699c198
+< 															{
+< 																$$ = new variable;
+< 																$$->eletype = $1->eletype;
+< 															}
+< 				|	LEFT_OPEN_BRACKET exp RIGHT_OPEN_BRACKET				{
+< 																				$$ = new variable;
+< 																				$$->eletype = $2->eletype;
+< 																			}	
+---
+> 				|	LEFT_OPEN_BRACKET exp RIGHT_OPEN_BRACKET					
+703,721d201
+< 															{
+< 																$$ = new variable;
+< 																search_func($1, found, fnptr);
+< 																if(!found)
+< 																{
+< 																	$$->eletype = ERRORTYPE;
+< 																	error("Function not declared");
+< 																	call_func_ptr = -1;
+< 																}
+< 																else
+< 																{
+< 																	$$->eletype = get_result_type(fnptr);
+< 																	call_func_ptr = fnptr;
+< 																	if(global_func[call_func_ptr].num_param != ($3))
+< 																	{
+< 																		error("Mismatch in number of parameters");
+< 																	}
+< 																}
+< 															}
+725,730c205
+< 								{
+< 									$$ = $1;
+< 								}
+< 				|				{
+< 									$$ = 0;
+< 								}
+---
+> 				|
+734,741d208
+< 								{
+< 									$$ = $3 + 1;
+< 									check_param_type(call_func_ptr, $$, $3->eletype, ok);
+< 									if(!ok)
+< 									{
+< 										error("Parameter type mismatch");
+< 									}
+< 								}
+743,750d209
+< 								{
+< 									$$ = 1;
+< 									check_param_type(call_func_ptr, 1, $1->eletype, ok);
+< 									if(!ok)
+< 									{
+< 										error("Parameter type mismatch");
+< 									}
+< 								}
+766,809d224
+< void patchtype(enum t type,vector <variable> &namelist,string name, int level)
+< {
+< 	for(int i=0;i<namelist.size();i++)
+< 	{
+< 		namelist[i].eletype = type;
+< 		if(type==STRUC)
+< 		{
+< 			namelist[i].struct_name = name;
+< 		}
+< 	}
+< }
+< void error (string err)
+< {
+< 	cout<<err<<endl;
+< 
+< }
+< int coercible(enum t type1, enum t type2)
+< {
+< 	return 1;
+< }
+< 
+< enum t not_compatible(enum t type)
+< {
+< 	if(type == ERRORTYPE || type == REAL)
+< 		return ERRORTYPE;
+< 	else
+< 		return type;
+< }
+< enum t compare_types(enum t type1,enum t type2)
+< {
+< 	return INT;
+< }
+< bool compatible_arithop(enum t type1, enum t type2)
+< {
+< 	return true;
+< }
+< 
+< void search_func(string name, bool &found, int &namptr)
+< {
+< }
+< 
+< void enter_func(string name, enum t type, int &namptr)
+< {
+< }
+\ No newline at end of file
